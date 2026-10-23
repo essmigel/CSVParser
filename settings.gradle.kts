@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SCVParser"
+rootProject.name = "CsvViewer"
 include(":app")
