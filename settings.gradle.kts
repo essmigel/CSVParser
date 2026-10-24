@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "CsvViewer"
 include(":app")
+include(":csv-parser")
