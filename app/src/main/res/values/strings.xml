@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">CSV Viewer</string>
+
+    <!-- Errors -->
+    <string name="error_network">The file could not be downloaded. Check your internet connection and try again.</string>
+    <string name="error_malformed_file">The file is not valid CSV. There is a problem on line %1$d.</string>
+    <string name="error_invalid_row_size">Row %1$d does not have the same number of values as the header (%2$d instead of %3$d).</string>
 </resources>

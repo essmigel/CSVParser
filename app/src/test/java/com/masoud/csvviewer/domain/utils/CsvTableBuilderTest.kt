@@ -18,7 +18,9 @@ class CsvTableBuilderTest {
 
     @Test
     fun `builds an empty table from no records`() {
-        assertEquals(CsvTable(columns = emptyList(), rows = emptyList()), builder.build(emptyList()))
+        val emptyTable = CsvTable(columns = emptyList(), rows = emptyList())
+
+        assertEquals(emptyTable, builder.build(emptyList()))
     }
 
     @Test

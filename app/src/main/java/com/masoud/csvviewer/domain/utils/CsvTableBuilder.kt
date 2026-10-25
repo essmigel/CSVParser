@@ -39,7 +39,11 @@ class CsvTableBuilder @Inject constructor() {
 
     private fun checkSize(row: List<String>, size: Int, rowNumber: Int) {
         if (row.size != size) {
-            throw InvalidRowSizeException(row = rowNumber, valueCount = row.size, columnCount = size)
+            throw InvalidRowSizeException(
+                row = rowNumber,
+                valueCount = row.size,
+                columnCount = size
+            )
         }
     }
 
