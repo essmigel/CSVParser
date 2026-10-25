@@ -10,6 +10,7 @@ import com.masoud.csvviewer.domain.model.Result
 import com.masoud.csvviewer.fakes.FakeGetCsvTableUseCase
 import com.masoud.csvviewer.presentation.common.UiText
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -20,6 +21,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class CsvTableViewModelTest {
 
     private val dispatcher = StandardTestDispatcher()
