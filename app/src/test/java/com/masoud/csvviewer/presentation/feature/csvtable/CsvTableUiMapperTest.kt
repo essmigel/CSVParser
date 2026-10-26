@@ -112,6 +112,14 @@ class CsvTableUiMapperTest {
     }
 
     @Test
+    fun `maps a server error to a message with the status code`() {
+        assertEquals(
+            CsvTableUiState.Error(UiText(R.string.error_server, listOf(500))),
+            mapper.toUiState(Result.Error(CsvError.Server(statusCode = 500)))
+        )
+    }
+
+    @Test
     fun `maps a malformed file error to a message with the line`() {
         assertEquals(
             CsvTableUiState.Error(UiText(R.string.error_malformed_file, listOf(4))),

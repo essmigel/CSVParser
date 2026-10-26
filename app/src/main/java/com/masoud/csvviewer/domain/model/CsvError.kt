@@ -2,8 +2,11 @@ package com.masoud.csvviewer.domain.model
 
 sealed interface CsvError {
 
-    /** The file could not be downloaded, because of the connection or the server. */
+    /** The server could not be reached, for example because the device is offline. */
     data object Network : CsvError
+
+    /** The server was reached but did not return the file. */
+    data class Server(val statusCode: Int) : CsvError
 
     /** The file is not valid CSV, for example a quoted value that is never closed. */
     data class MalformedFile(val line: Int) : CsvError

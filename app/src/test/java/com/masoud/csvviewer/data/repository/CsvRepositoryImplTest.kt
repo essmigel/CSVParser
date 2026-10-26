@@ -48,10 +48,14 @@ class CsvRepositoryImplTest {
     }
 
     @Test
-    fun `returns a network error when the server responds with an error`() = runTest {
-        server.enqueue(MockResponse(code = 500))
+    fun `returns a server error with the status code when the server responds with an error`() =
+        runTest {
+            server.enqueue(MockResponse(code = 500))
 
-        assertEquals(Result.Error(CsvError.Network), repository().fetchRecords())
+            assertEquals(
+                Result.Error(CsvError.Server(statusCode = 500)),
+                repository().fetchRecords()
+            )
     }
 
     @Test

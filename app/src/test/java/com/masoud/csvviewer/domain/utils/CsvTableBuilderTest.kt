@@ -2,10 +2,11 @@ package com.masoud.csvviewer.domain.utils
 
 import com.masoud.csvviewer.domain.model.Column
 import com.masoud.csvviewer.domain.model.ColumnType
+import com.masoud.csvviewer.domain.model.CsvError
 import com.masoud.csvviewer.domain.model.CsvTable
 import com.masoud.csvviewer.domain.model.CsvValue
+import com.masoud.csvviewer.domain.model.Result
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertThrows
 import org.junit.Test
 import java.time.LocalDateTime
 
@@ -13,19 +14,22 @@ class CsvTableBuilderTest {
 
     private val builder = CsvTableBuilder()
 
+    private fun buildTable(records: List<List<String>>): CsvTable =
+        (builder.build(records) as Result.Success).data
+
     private fun typeOfColumn(vararg values: String): ColumnType =
-        builder.build(listOf(listOf("Column")) + values.map { listOf(it) }).columns.single().type
+        buildTable(listOf(listOf("Column")) + values.map { listOf(it) }).columns.single().type
 
     @Test
     fun `builds an empty table from no records`() {
         val emptyTable = CsvTable(columns = emptyList(), rows = emptyList())
 
-        assertEquals(emptyTable, builder.build(emptyList()))
+        assertEquals(emptyTable, buildTable(emptyList()))
     }
 
     @Test
     fun `builds string columns without rows from a header only`() {
-        val table = builder.build(listOf(listOf("Name", "Count")))
+        val table = buildTable(listOf(listOf("Name", "Count")))
 
         assertEquals(
             listOf(Column("Name", ColumnType.STRING), Column("Count", ColumnType.STRING)),
@@ -78,13 +82,32 @@ class CsvTableBuilderTest {
     }
 
     @Test
+    fun `ignores spaces around integers and dates but keeps them in text`() {
+        val records = listOf(
+            listOf("Name", "Count", "Date"),
+            listOf(" Theo ", " 5", "1978-01-02 ")
+        )
+
+        assertEquals(
+            listOf(
+                listOf(
+                    CsvValue.Text(" Theo "),
+                    CsvValue.Integer(5),
+                    CsvValue.Date(LocalDateTime.of(1978, 1, 2, 0, 0))
+                )
+            ),
+            buildTable(records).rows
+        )
+    }
+
+    @Test
     fun `detects a string column when every value is blank`() {
         assertEquals(ColumnType.STRING, typeOfColumn("", ""))
     }
 
     @Test
     fun `converts blank values to Empty`() {
-        val table = builder.build(listOf(listOf("Name", "Count"), listOf(" ", "")))
+        val table = buildTable(listOf(listOf("Name", "Count"), listOf(" ", "")))
 
         assertEquals(listOf(listOf(CsvValue.Empty, CsvValue.Empty)), table.rows)
     }
@@ -93,22 +116,20 @@ class CsvTableBuilderTest {
     fun `rejects a row with fewer values than columns`() {
         val records = listOf(listOf("Name", "Count"), listOf("Theo", "5"), listOf("Fiona"))
 
-        val exception = assertThrows(InvalidRowSizeException::class.java) { builder.build(records) }
-
-        assertEquals(3, exception.row)
-        assertEquals(1, exception.valueCount)
-        assertEquals(2, exception.columnCount)
+        assertEquals(
+            Result.Error(CsvError.InvalidRowSize(row = 3, valueCount = 1, columnCount = 2)),
+            builder.build(records)
+        )
     }
 
     @Test
     fun `rejects a row with more values than columns`() {
         val records = listOf(listOf("Name"), listOf("Theo", "5"))
 
-        val exception = assertThrows(InvalidRowSizeException::class.java) { builder.build(records) }
-
-        assertEquals(2, exception.row)
-        assertEquals(2, exception.valueCount)
-        assertEquals(1, exception.columnCount)
+        assertEquals(
+            Result.Error(CsvError.InvalidRowSize(row = 2, valueCount = 2, columnCount = 1)),
+            builder.build(records)
+        )
     }
 
     @Test
@@ -119,7 +140,7 @@ class CsvTableBuilderTest {
             listOf("Fiona", "de Vries", "7", "1950-11-12T00:00:00")
         )
 
-        val table = builder.build(records)
+        val table = buildTable(records)
 
         assertEquals(
             CsvTable(

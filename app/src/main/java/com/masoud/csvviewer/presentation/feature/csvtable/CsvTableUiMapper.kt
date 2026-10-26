@@ -38,6 +38,7 @@ class CsvTableUiMapper @Inject constructor() {
 
     private fun toMessage(error: CsvError): UiText = when (error) {
         CsvError.Network -> UiText(R.string.error_network)
+        is CsvError.Server -> UiText(R.string.error_server, listOf(error.statusCode))
         is CsvError.MalformedFile -> UiText(R.string.error_malformed_file, listOf(error.line))
         is CsvError.InvalidRowSize -> UiText(
             R.string.error_invalid_row_size,

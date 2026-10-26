@@ -33,7 +33,7 @@ class CsvRepositoryImpl @Inject constructor(
                 if (response.isSuccessful) {
                     Result.Success(parser.parse(response.body.charStream()))
                 } else {
-                    Result.Error(CsvError.Network)
+                    Result.Error(CsvError.Server(statusCode = response.code))
                 }
             }
         } catch (_: IOException) {
